@@ -1,0 +1,24 @@
+*** Trac-1.0.10/trac/htdocs/js/threaded_comments.js	2016-02-20 07:53:27.000000000 +0300
+--- Trac-1.0.10-new/trac/htdocs/js/threaded_comments.js	2016-02-25 12:14:27.000000000 +0300
+***************
+*** 22,29 ****
+    var commentsOnly = $("#trac-comments-only-toggle");
+    var applyCommentsOnly = function() {
+      if (commentsOnly.attr('checked')) {
+!       $("div.change:not(.trac-new):not(:has(.trac-field-attachment)) ul.changes").hide();
+!       $("div.change:not(.trac-new):not(:has(.trac-field-attachment)):not(:has(.comment))").hide();
+      } else {
+        $("div.change ul.changes").show();
+        $("div.change").show();
+--- 22,32 ----
+    var commentsOnly = $("#trac-comments-only-toggle");
+    var applyCommentsOnly = function() {
+      if (commentsOnly.attr('checked')) {
+!       $("div.change:not(.trac-new)) ul.changes").hide();
+!       $("div.change:not(.trac-new):has(.trac-field-attachment)").hide();
+!       $("div.change:not(.trac-new):not(:has(.comment))").hide();
+!       $('div.change:not(.trac-new):contains("Add a subticket #")').hide();
+!       $('div.change:not(.trac-new):contains("Remove a subticket #")').hide();
+      } else {
+        $("div.change ul.changes").show();
+        $("div.change").show();

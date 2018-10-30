@@ -1,0 +1,131 @@
+diff -cr trunk/privatetickets/policy.py trunk-roand/privatetickets/policy.py
+*** trunk/privatetickets/policy.py	2014-05-31 08:02:54.000000000 +0400
+--- trunk-roand/privatetickets/policy.py	2015-11-10 10:19:00.000000000 +0300
+***************
+*** 31,42 ****
+      
+      ignore_permissions = set([
+          'TRAC_ADMIN',
+!         'TICKET_VIEW_REPORTER',
+!         'TICKET_VIEW_OWNER',
+!         'TICKET_VIEW_CC',
+!         'TICKET_VIEW_REPORTER_GROUP',
+!         'TICKET_VIEW_OWNER_GROUP',
+!         'TICKET_VIEW_CC_GROUP',
+      ])
+      
+      # IPermissionPolicy(Interface)
+--- 31,43 ----
+      
+      ignore_permissions = set([
+          'TRAC_ADMIN',
+!         'TICKET_VIEW',
+!         'TICKET_REPORTER',
+!         'TICKET_OWNER',
+!         'TICKET_CC',
+!         'TICKET_REPORTER_GROUP',
+!         'TICKET_OWNER_GROUP',
+!         'TICKET_CC_GROUP',
+      ])
+      
+      # IPermissionPolicy(Interface)
+***************
+*** 58,71 ****
+      
+      # IPermissionRequestor methods
+      def get_permission_actions(self):
+!         actions = ['TICKET_VIEW_REPORTER', 'TICKET_VIEW_OWNER',
+!                    'TICKET_VIEW_CC']
+!         group_actions = ['TICKET_VIEW_REPORTER_GROUP',
+!                          'TICKET_VIEW_OWNER_GROUP',
+!                          'TICKET_VIEW_CC_GROUP']
+          all_actions = actions + [(a+'_GROUP', [a]) for a in actions]
+!         return all_actions + [('TICKET_VIEW_SELF', actions),
+!                               ('TICKET_VIEW_GROUP', group_actions)]
+      
+      # Public methods
+      def check_ticket_access(self, perm, res):
+--- 59,72 ----
+      
+      # IPermissionRequestor methods
+      def get_permission_actions(self):
+!         actions = ['TICKET_REPORTER', 'TICKET_OWNER',
+!                    'TICKET_CC']
+!         group_actions = ['TICKET_REPORTER_GROUP',
+!                          'TICKET_OWNER_GROUP',
+!                          'TICKET_CC_GROUP']
+          all_actions = actions + [(a+'_GROUP', [a]) for a in actions]
+!         return all_actions + [('TICKET_SELF', actions),
+!                               ('TICKET_GROUP', group_actions)]
+      
+      # Public methods
+      def check_ticket_access(self, perm, res):
+***************
+*** 77,109 ****
+          
+          had_any = False
+          
+!         if perm.has_permission('TICKET_VIEW_REPORTER'):
+              had_any = True
+              if tkt['reporter'] == perm.username:
+                  return None
+          
+!         if perm.has_permission('TICKET_VIEW_CC'):
+              had_any = True
+              cc_list = Chrome(self.env).cc_list(tkt['cc'])
+              if perm.username in cc_list:
+                  return None
+          
+!         if perm.has_permission('TICKET_VIEW_OWNER'):
+              had_any = True
+              if perm.username == tkt['owner']:
+                  return None
+          
+!         if perm.has_permission('TICKET_VIEW_REPORTER_GROUP'):
+              had_any = True
+              if self._check_group(perm.username, tkt['reporter']):
+                  return None
+          
+!         if perm.has_permission('TICKET_VIEW_OWNER_GROUP'):
+              had_any = True
+              if self._check_group(perm.username, tkt['owner']):
+                  return None
+          
+!         if perm.has_permission('TICKET_VIEW_CC_GROUP'):
+              had_any = True
+              cc_list = Chrome(self.env).cc_list(tkt['cc'])
+              for user in cc_list:
+--- 78,110 ----
+          
+          had_any = False
+          
+!         if perm.has_permission('TICKET_REPORTER'):
+              had_any = True
+              if tkt['reporter'] == perm.username:
+                  return None
+          
+!         if perm.has_permission('TICKET_CC'):
+              had_any = True
+              cc_list = Chrome(self.env).cc_list(tkt['cc'])
+              if perm.username in cc_list:
+                  return None
+          
+!         if perm.has_permission('TICKET_OWNER'):
+              had_any = True
+              if perm.username == tkt['owner']:
+                  return None
+          
+!         if perm.has_permission('TICKET_REPORTER_GROUP'):
+              had_any = True
+              if self._check_group(perm.username, tkt['reporter']):
+                  return None
+          
+!         if perm.has_permission('TICKET_OWNER_GROUP'):
+              had_any = True
+              if self._check_group(perm.username, tkt['owner']):
+                  return None
+          
+!         if perm.has_permission('TICKET_CC_GROUP'):
+              had_any = True
+              cc_list = Chrome(self.env).cc_list(tkt['cc'])
+              for user in cc_list:

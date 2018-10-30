@@ -1,0 +1,52 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/"
+      py:strip="">
+
+<!-- Шаблоны новой карточки  -->
+<form py:match="div[@id='content' and @class='ticket']/form" py:attrs="select('@*')">
+  ${select('*')}
+  <py:if test="req.environ['PATH_INFO'] == '/newticket' and (not 'preview' in req.args)">
+    <script>
+    //<![CDATA[ 
+       var uiText = "== Пользовательский интерфейс:\n"
+                  + "[[Image(ui.png,center,100% ui.png)]]\n\n"
+                  + "== Описание элементов:\n"
+                  + "  * '''Тип и наименование элемента'''[[BR]]\n"
+                  + "    Описание элемента";
+       var scenaryText = "== Предварительные условия:\n"
+                       + "  * Предварительное условие\n\n"
+                       + "== Выходные условия:\n"
+                       + "  * Выходное условие\n\n"
+                       + "== Основной поток:\n"
+                       + "'''Наименование основного потока'''\n"
+                       + "1. '''Пользователь:'''[[BR]]\n"
+                       + "   Описание действий пользователя.\n"
+                       + "2. '''Система:'''[[BR]]\n"
+                       + "   Описание действий системы.\n\n"
+                       + "== Альтернативные потоки:\n"
+                       + "'''3a. Наименование альтернативного потока'''\n"
+                       + "1. '''Пользователь:'''[[BR]]\n"
+                       + "   Описание действий пользователя.\n"
+                       + "2. '''Система:'''[[BR]]\n"
+                       + "   Описание действий системы.\n\n";
+
+       document.getElementById("field-type").addEventListener("change", function() {
+          var selectIndex=this.selectedIndex;
+          var selectValue=this.options[selectIndex].text;
+          var output=document.getElementById("field-description");
+          if (output.value=="" || output.value==uiText || output.value==scenaryText) {
+             if (selectValue=="UC")
+                output.value=scenaryText;
+             else if (selectValue=="UI")
+                output.value=uiText;
+             else output.value="";
+          } 
+       });
+     // ]]>
+    </script>
+  </py:if> 
+</form>
+
+</html>
+ 

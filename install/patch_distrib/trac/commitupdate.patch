@@ -1,0 +1,61 @@
+diff -cr Trac-1.0.9/tracopt/ticket/commit_updater.py Trac-1.0.9-roand/tracopt/ticket/commit_updater.py
+*** Trac-1.0.9/tracopt/ticket/commit_updater.py	2015-09-11 15:05:48.000000000 +0300
+--- Trac-1.0.9-roand/tracopt/ticket/commit_updater.py	2015-11-14 20:57:54.500945365 +0300
+***************
+*** 204,210 ****
+              revstring += '/' + repos.reponame
+              drev += '/' + repos.reponame
+          return """\
+! In [changeset:"%s" %s]:
+  {{{
+  #!CommitTicketReference repository="%s" revision="%s"
+  %s
+--- 204,210 ----
+              revstring += '/' + repos.reponame
+              drev += '/' + repos.reponame
+          return """\
+! **Changeset** [changeset:"%s" %s]:
+  {{{
+  #!CommitTicketReference repository="%s" revision="%s"
+  %s
+***************
+*** 256,264 ****
+          return functions
+  
+      def _authname(self, changeset):
+!         return changeset.author.lower() \
+                 if self.env.config.getbool('trac', 'ignore_auth_case') \
+!                else changeset.author
+  
+      # Command-specific behavior
+      # The ticket isn't updated if all extracted commands return False.
+--- 256,264 ----
+          return functions
+  
+      def _authname(self, changeset):
+!         return changeset.author.split()[0].lower() \
+                 if self.env.config.getbool('trac', 'ignore_auth_case') \
+!                else changeset.author.split()[0]
+  
+      # Command-specific behavior
+      # The ticket isn't updated if all extracted commands return False.
+***************
+*** 269,275 ****
+              self.log.info("%s doesn't have TICKET_MODIFY permission for #%d",
+                            authname, ticket.id)
+              return False
+!         ticket['status'] = 'closed'
+          ticket['resolution'] = 'fixed'
+          if not ticket['owner']:
+              ticket['owner'] = authname
+--- 269,278 ----
+              self.log.info("%s doesn't have TICKET_MODIFY permission for #%d",
+                            authname, ticket.id)
+              return False
+!         if ticket['type'] == 'TASK':
+!             ticket['status'] = 'closed'
+!         else:
+!             ticket['status'] = 'resolve'
+          ticket['resolution'] = 'fixed'
+          if not ticket['owner']:
+              ticket['owner'] = authname

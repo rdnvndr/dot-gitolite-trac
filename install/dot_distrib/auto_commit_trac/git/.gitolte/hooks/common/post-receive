@@ -1,0 +1,39 @@
+#! /bin/sh
+
+tracenv="/srv/trac/vrtsource"
+tracadmin=trac-admin
+reponame="`pwd`"
+log=/dev/null
+nullrev=0000000000000000000000000000000000000000
+grep_args=-vF
+changed=0
+revlist_args=
+
+while read oldrev newrev refname; do
+    grep_args="$grep_args -e $refname"
+    if [ $newrev != $nullrev ]; then  # branch is removed
+        changed=1
+        revlist_args="$revlist_args $newrev"
+        if [ $oldrev != $nullrev ]; then  # branch is updated
+            revlist_args="$revlist_args ^$oldrev"
+        fi
+    fi
+done
+
+exec >>"$log" 2>&1
+
+if [ $changed = 0 ]; then
+    # no new commits, but repository is changed
+    nohup "$tracadmin" "$tracenv" repository sync "$reponame" &
+else
+    refnames="`
+        git for-each-ref --format='%(refname)' refs/heads | \
+            grep $grep_args`"
+    for refname in $refnames; do
+        revlist_args="$revlist_args ^$refname"
+    done
+    nohup $SHELL <<_EOS_ &
+        git rev-list --reverse $revlist_args | \
+            xargs "$tracadmin" "$tracenv" changeset added "$reponame"
+_EOS_
+fi

@@ -1,0 +1,13 @@
+[core]
+    quotepath = false
+    pager = less -r
+    abbrev = 8
+
+[format]
+    pretty = commit %h%d%nAuthor: %an <%ae> %nDate:   %ad%C(reset)%n%n%w(72,4,4)
+
+[push]
+	default = simple
+[user]
+	name = Administrator
+	email = root@vrtsource

@@ -1,0 +1,38 @@
+*** Trac-1.0.9/trac/ticket/web_ui.py	2015-09-11 15:05:49.000000000 +0300
+--- Trac-1.0.9/new_trac/ticket/web_ui.py	2016-02-13 20:34:18.000000000 +0300
+***************
+*** 201,206 ****
+--- 201,214 ----
+              return
+          ticket_realm = Resource('ticket')
+          with self.env.db_query as db:
++             ticket_type_sql = ""
++             if terms and (len(terms) > 1):
++                 for ticket_type in db("""SELECT name FROM enum WHERE type='ticket_type'"""):
++                    tk_type = "".join(ticket_type)
++                    if terms[0] == tk_type:
++                        ticket_type_sql = """ AND type='"""+tk_type + """'"""
++                        terms.remove(tk_type)
++                        break
+              sql, args = search_to_sql(db, ['summary', 'keywords',
+                                             'description', 'reporter', 'cc',
+                                             db.cast('id', 'text')], terms)
+***************
+*** 218,225 ****
+                                WHERE field='comment' AND %s
+                              UNION
+                                SELECT ticket FROM ticket_custom WHERE %s
+!                           )
+!                           """ % (sql, sql2, sql3),
+                            args + args2 + args3):
+                  t = ticket_realm(id=tid)
+                  if 'TICKET_VIEW' in req.perm(t):
+--- 226,233 ----
+                                WHERE field='comment' AND %s
+                              UNION
+                                SELECT ticket FROM ticket_custom WHERE %s
+!                           ) %s
+!                           """ % (sql, sql2, sql3, ticket_type_sql),
+                            args + args2 + args3):
+                  t = ticket_realm(id=tid)
+                  if 'TICKET_VIEW' in req.perm(t):
