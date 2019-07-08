@@ -57,6 +57,12 @@ RUN chmod 755 /usr/share/gitolite3/VREF/CHECKID
 ADD install/dot_distrib/gitolite/onlymerge/ONLYMERGE /usr/share/gitolite3/VREF/
 RUN chmod 755 /usr/share/gitolite3/VREF/ONLYMERGE
 
+# add start trac
+ADD install/dot_distrib/trac/systemd/system/nginx_tracd.service /etc/systemd/system/
+RUN chmod 755 /etc/systemd/system/nginx_tracd.service
+ADD install/dot_distrib/trac/systemd/system/tracd.service /etc/systemd/system/
+RUN chmod 755 /etc/systemd/system/tracd.service
+
 ENTRYPOINT ["/sbin/init"]
 CMD ["--log-level=info"]
 STOPSIGNAL SIGRTMIN+3

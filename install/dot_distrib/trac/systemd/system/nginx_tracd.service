@@ -1,0 +1,19 @@
+[Unit]
+
+Description=Trac service
+After=network.target remote-fs.target nss-lookup.target nginx.service
+
+[Service]
+Type=forking
+ExecStart=/bin/sh -c '\
+   INSTANCES="3050 3051 3052"; \
+   PYTHON_EGG_CACHE="/srv/trac/egg_cache"; \
+   ARGS="-s /srv/trac/vrtsource"; \
+   export PYTHON_EGG_CACHE; \
+   for I in $INSTANCES; do  \
+      /usr/local/bin/tracd -d --group=root --user=root -p $I $ARGS ; \
+   done; \
+'
+
+[Install]
+WantedBy=multi-user.target
