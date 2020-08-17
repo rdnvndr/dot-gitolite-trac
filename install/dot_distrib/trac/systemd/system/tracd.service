@@ -5,7 +5,7 @@ After=network.target remote-fs.target nss-lookup.target
 [Service]
 Type=simple
 # Example: copy it into /etc/systemd/ and edit.
-ExecStart=/usr/local/bin/tracd -s -p 80 /srv/trac/vrtsource
+ExecStart=/usr/bin/tracd -s -p 80 /srv/trac/vrtsource
 
 [Install]
 WantedBy=multi-user.target

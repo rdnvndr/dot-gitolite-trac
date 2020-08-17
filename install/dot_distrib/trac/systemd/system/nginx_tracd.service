@@ -11,7 +11,7 @@ ExecStart=/bin/sh -c '\
    ARGS="-s /srv/trac/vrtsource"; \
    export PYTHON_EGG_CACHE; \
    for I in $INSTANCES; do  \
-      /usr/local/bin/tracd -d --group=root --user=root -p $I $ARGS ; \
+      /usr/bin/tracd -d --group=root --user=root -p $I $ARGS ; \
    done; \
 '
 

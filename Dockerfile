@@ -1,21 +1,21 @@
 FROM centos
 ENV container=podman  
 # sshd
-RUN echo -e "qwerty\nqwerty\n" | passwd root
+RUN yum install -y epel-release
+RUN echo "root:qwerty" | chpasswd
 RUN yum install -y openssh-server && yum upgrade -y
 RUN mkdir -p /var/run/sshd ; chmod -rx /var/run/sshd
-# http://stackoverflow.com/questions/2419412/ssh-connection-stop-at-debug1-ssh2-msg-kexinit-sent
-#RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 # Bad security, add a user and sudo instead!
 RUN sed -ri 's/#PermitRootLogin yes/PermitRootLogin yes/g' /etc/ssh/sshd_config
 # http://stackoverflow.com/questions/18173889/cannot-access-centos-sshd-on-docker
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
 # install gitolite and trac
-RUN yum install -y epel-release 
-RUN yum install -y gitolite3 python-babel python-backports \
-python-backports-ssl_match_hostname python-genshi python-ipaddress \
-python-setuptools nginx-all-modules postgresql-server unzip patch
+RUN yum install -y gitolite3 gcc redhat-rpm-config  python2-devel \
+python2-babel python2-backports python2-backports-ssl_match_hostname \
+python2-ipaddress python2-setuptools nginx-all-modules postgresql-server \
+unzip patch
 RUN mkdir /root/trac
 ADD trac_distrib/* /root/trac
 RUN cd /root/trac/; unzip \*.zip; rm *.zip 
@@ -36,6 +36,7 @@ RUN cd /root/trac/trac-subtickets-plugin-master; \
     patch -p1 < recursion-validating.patch
 # install trac
 RUN cp -R /root/trac/patch_distrib/announcerplugin/* /root/trac/privateticketsplugin/trunk
+RUN easy_install-2.7 /root/trac/genshi-0.7.3
 RUN easy_install-2.7 /root/trac/Trac-1.0.17
 RUN easy_install-2.7 /root/trac/regexlinkplugin
 RUN easy_install-2.7 /root/trac/WikiReportMacro-master
@@ -63,6 +64,7 @@ RUN chmod 755 /etc/systemd/system/nginx_tracd.service
 ADD install/dot_distrib/trac/systemd/system/tracd.service /etc/systemd/system/
 RUN chmod 755 /etc/systemd/system/tracd.service
 
+RUN systemctl disable kdump
 ENTRYPOINT ["/sbin/init"]
 CMD ["--log-level=info"]
 STOPSIGNAL SIGRTMIN+3
