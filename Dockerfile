@@ -14,8 +14,14 @@ RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
 # install gitolite and trac
 RUN yum install -y gitolite3 gcc redhat-rpm-config  python2-devel \
 python2-babel python2-backports python2-backports-ssl_match_hostname \
-python2-ipaddress python2-setuptools nginx-all-modules postgresql-server \
-unzip patch
+python2-ipaddress python2-psycopg2 python2-setuptools nginx-all-modules postgresql-server \
+unzip patch glibc-locale-source
+RUN localedef --no-archive -i ru_RU -f UTF-8 ru_RU.UTF-8
+ENV LANG ru_RU.UTF-8
+ENV LC_ALL ru_RU.UTF-8
+RUN export LANG=ru_RU.UTF-8
+# RUN su postgres -c "/usr/bin/postgresql-setup --initdb"
+# RUN systemctl enable postgresql
 RUN mkdir /root/trac
 ADD trac_distrib/* /root/trac
 RUN cd /root/trac/; unzip \*.zip; rm *.zip 
@@ -36,7 +42,7 @@ RUN cd /root/trac/trac-subtickets-plugin-master; \
     patch -p1 < recursion-validating.patch
 # install trac
 RUN cp -R /root/trac/patch_distrib/announcerplugin/* /root/trac/privateticketsplugin/trunk
-RUN easy_install-2.7 /root/trac/genshi-0.7.3
+RUN easy_install-2.7 /root/trac/Genshi-0.6
 RUN easy_install-2.7 /root/trac/Trac-1.0.17
 RUN easy_install-2.7 /root/trac/regexlinkplugin
 RUN easy_install-2.7 /root/trac/WikiReportMacro-master
